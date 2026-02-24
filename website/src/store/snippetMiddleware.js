@@ -68,9 +68,6 @@ async function saveSnippet({fork}, state, next, storageAdapter) {
   const parser = selectors.getParser(state);
   const parserSettings = selectors.getParserSettings(state);
   const code = selectors.getCode(state);
-  const transformCode = selectors.getTransformCode(state);
-  const transformer = selectors.getTransformer(state);
-  const showTransformPanel = selectors.showTransformer(state);
 
   const data = {
     parserID: parser.id,
@@ -83,12 +80,6 @@ async function saveSnippet({fork}, state, next, storageAdapter) {
     filename: `source.${parser.category.fileExtension}`,
     code,
   };
-  if (showTransformPanel && transformer) {
-    data.toolID = transformer.id;
-    data.versions[transformer.id] = transformer.version;
-    data.transform = transformCode;
-  }
-
 
   try {
     let newRevision;

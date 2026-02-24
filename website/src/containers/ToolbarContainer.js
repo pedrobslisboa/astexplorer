@@ -4,8 +4,6 @@ import {
   selectCategory,
   openSettingsDialog,
   openShareDialog,
-  selectTransformer,
-  hideTransformer,
   setParser,
   reset,
   setKeyMap,
@@ -23,9 +21,7 @@ function mapStateToProps(state) {
     canFork: selectors.canFork(state),
     category: parser.category,
     parser,
-    transformer: selectors.getTransformer(state),
     keyMap: selectors.getKeyMap(state),
-    showTransformer: selectors.showTransformer(state),
     snippet: selectors.getRevision(state),
   };
 }
@@ -44,9 +40,6 @@ function mapDispatchToProps(dispatch) {
     onShareButtonClick: () => {
       dispatch(openShareDialog());
     },
-    onTransformChange: transformer => {
-      dispatch(transformer ? selectTransformer(transformer) : hideTransformer());
-    },
     onKeyMapChange: keyMap => {
       dispatch(setKeyMap(keyMap))
     },
@@ -63,4 +56,3 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Toolbar);
-

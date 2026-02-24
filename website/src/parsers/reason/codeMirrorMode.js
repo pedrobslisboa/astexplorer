@@ -1,3 +1,5 @@
+import 'codemirror/mode/clike/clike';
+
 export default function(CodeMirror) {
   /* https://github.com/facebook/reason/blob/master/src/reason-parser/reason_lexer.mll#L94-L154 */
   const keywords = (

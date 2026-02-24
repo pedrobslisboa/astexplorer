@@ -1,7 +1,7 @@
 import * as actions from './actions';
-import {getCategoryByID, getDefaultParser, getParserByID, getTransformerByID} from '../parsers';
+import {getCategoryByID, getDefaultParser, getParserByID} from '../parsers';
 
-const defaultParser = getDefaultParser(getCategoryByID('javascript'));
+const defaultParser = getDefaultParser(getCategoryByID('reason'));
 
 const initialState = {
 
@@ -14,7 +14,6 @@ const initialState = {
   saving: false,
   cursor: null,
   error: null,
-  showTransformPanel: false,
 
   // Snippet related state
   selectedRevision: null,
@@ -34,15 +33,7 @@ const initialState = {
     code: defaultParser.category.codeExample,
     keyMap: 'default',
     initialCode: defaultParser.category.codeExample,
-    transform: {
-      code: '',
-      initialCode: '',
-      transformer: null,
-      transformResult: null,
-    },
   },
-
-  enableFormatting: false,
 
 };
 
@@ -51,11 +42,8 @@ const initialState = {
  */
 export function persist(state) {
   return {
-    ...pick(state, 'showTransformPanel', 'parserSettings', 'parserPerCategory'),
-    workbench: {
-      ...pick(state.workbench, 'parser', 'code', 'keyMap'),
-      transform: pick(state.workbench.transform, 'code', 'transformer'),
-    },
+    ...pick(state, 'parserSettings', 'parserPerCategory'),
+    workbench: pick(state.workbench, 'parser', 'code', 'keyMap'),
   };
 }
 
@@ -70,10 +58,6 @@ export function revive(state=initialState) {
       ...state.workbench,
       initialCode: state.workbench.code,
       parserSettings: state.parserSettings[state.workbench.parser] || null,
-      transform: {
-        ...state.workbench.transform,
-        initialCode: state.workbench.transform.code,
-      },
     },
   };
 }
@@ -89,7 +73,6 @@ export function astexplorer(state=initialState, action) {
     forking: forking(state.forking, action),
     cursor: cursor(state.cursor, action),
     error: error(state.error, action),
-    showTransformPanel: showTransformPanel(state.showTransformPanel, action),
 
     // Snippet related state
     activeRevision: activeRevision(state.activeRevision, action),
@@ -98,26 +81,7 @@ export function astexplorer(state=initialState, action) {
     parserPerCategory: parserPerCategory(state.parserPerCategory, action),
     parserSettings: parserSettings(state.parserSettings, action, state),
     workbench: workbench(state.workbench, action, state),
-    enableFormatting: format(state.enableFormatting, action, state),
   };
-}
-
-function format(state=initialState.enableFormatting, action) {
-  if (action.type === actions.TOGGLE_FORMATTING) return !state;
-  return state;
-}
-
-function getDefaultTransform(transformer, workbenchState) {
-  if (typeof transformer.formatCodeExample === 'function') {
-    return transformer.formatCodeExample(
-      transformer.defaultTransform,
-      {
-        parser: workbenchState.parser,
-        parserSettings: workbenchState.parserSettings || {},
-      },
-    )
-  }
-  return transformer.defaultTransform
 }
 
 function workbench(state=initialState.workbench, action, fullState) {
@@ -156,80 +120,14 @@ function workbench(state=initialState.workbench, action, fullState) {
           // Update parser settings
           newState.parserSettings =
             fullState.parserSettings[action.parser.id] || null;
-
-          // Check if we might want to reformat the code example
-          const transformer = getTransformerByID(state.transform.transformer)
-          if (transformer && state.transform.code === getDefaultTransform(transformer, state)) {
-            newState.transform = {
-              ...state.transform,
-              code: getDefaultTransform(transformer, newState),
-            }
-          }
         }
         return newState;
       }
     case actions.SET_CODE:
       return {...state, code: action.code};
-    case actions.SELECT_TRANSFORMER:
-      {
-        const parserIsCompatible =
-          action.transformer.compatibleParserIDs && action.transformer.compatibleParserIDs.has(state.parser)
-        const differentParser =
-          action.transformer.defaultParserID !== state.parser && !parserIsCompatible;
-        const differentTransformer =
-          action.transformer.id !== state.transform.transformer ;
-
-        if (!(differentParser || differentTransformer)) {
-          return state;
-        }
-
-        const newState = {...state};
-
-        if (differentParser) {
-          newState.parser = action.transformer.defaultParserID;
-          newState.parserSettings =
-            fullState.parserSettings[action.transformer.defaultParserID] || null;
-        }
-
-        if (differentTransformer) {
-          const snippetHasDifferentTransform = fullState.activeRevision &&
-            fullState.activeRevision.getTransformerID() === action.transformer.id;
-          newState.transform = {
-            ...state.transform,
-            transformer: action.transformer.id,
-            transformResult: null,
-            code: snippetHasDifferentTransform ?
-              state.transform.code :
-              getDefaultTransform(action.transformer, state),
-            initialCode: snippetHasDifferentTransform ?
-              fullState.activeRevision.getTransformCode() :
-              getDefaultTransform(action.transformer, state),
-          };
-        }
-
-        return newState;
-      }
-    case actions.SET_TRANSFORM:
-      return {
-        ...state,
-        transform: {
-          ...state.transform,
-          code: action.code,
-        },
-      };
-    case actions.SET_TRANSFORM_RESULT:
-      return {
-        ...state,
-        transform: {
-          ...state.transform,
-          transformResult: action.result,
-        },
-      };
     case actions.SET_SNIPPET:
       {
         const {revision} = action;
-
-        const transformerID = revision.getTransformerID();
         const parserID = revision.getParserID();
 
         return {
@@ -238,34 +136,17 @@ function workbench(state=initialState.workbench, action, fullState) {
           parserSettings: revision.getParserSettings() || fullState.parserSettings[parserID] || null,
           code: revision.getCode(),
           initialCode: revision.getCode(),
-          transform: {
-            ...state.transform,
-            transformer: transformerID,
-            code: revision.getTransformCode(),
-            initialCode: revision.getTransformCode(),
-          },
         };
       }
     case actions.CLEAR_SNIPPET:
     case actions.RESET:
       {
-        const reset = Boolean(actions.RESET);
-        const newState = {
+        return {
           ...state,
           parserSettings: fullState.parserSettings[state.parser] || null,
           code: getParserByID(state.parser).category.codeExample,
           initialCode: getParserByID(state.parser).category.codeExample,
         };
-        if (fullState.activeRevision && fullState.activeRevision.getTransformerID() || reset && state.transform.transformer) {
-          // Clear transform as well
-          const transformer = getTransformerByID(state.transform.transformer);
-          newState.transform = {
-            ...state.transform,
-            code: getDefaultTransform(transformer, state),
-            initialCode: getDefaultTransform(transformer, state),
-          };
-        }
-        return newState;
       }
     case actions.SET_KEY_MAP:
       return {...state, keyMap: action.keyMap};
@@ -392,21 +273,6 @@ function error(state=initialState.error, action) {
       return action.error;
     case actions.CLEAR_ERROR:
       return null;
-    default:
-      return state;
-  }
-}
-
-function showTransformPanel(state=initialState.showTransformPanel, action) {
-  switch (action.type) {
-    case actions.SELECT_TRANSFORMER:
-      return true;
-    case actions.HIDE_TRANSFORMER:
-    case actions.SELECT_CATEGORY:
-    case actions.CLEAR_SNIPPET:
-      return false;
-    case actions.SET_SNIPPET:
-      return Boolean(action.revision.getTransformerID());
     default:
       return state;
   }

@@ -3,13 +3,11 @@ import React from 'react';
 import CategoryButton from './buttons/CategoryButton';
 import ParserButton from './buttons/ParserButton';
 import SnippetButton from './buttons/SnippetButton';
-import TransformButton from './buttons/TransformButton';
 import KeyMapButton from './buttons/KeyMapButton';
 
 export default function Toolbar(props) {
-  let {parser, transformer, showTransformer} = props;
+  let {parser} = props;
   let parserInfo = parser.displayName;
-  let transformerInfo = '';
   if (parser) {
     if (parser.version) {
       parserInfo += '-' + parser.version;
@@ -19,17 +17,6 @@ export default function Toolbar(props) {
         <a href={parser.homepage} target="_blank" rel="noopener noreferrer">{parserInfo}</a>;
     }
   }
-  if (showTransformer) {
-    transformerInfo = transformer.displayName;
-    if (transformer.version) {
-      transformerInfo += '-' + transformer.version;
-    }
-    if (transformer.homepage) {
-      transformerInfo =
-        <a href={transformer.homepage} target="_blank" rel="noopener noreferrer">{transformerInfo}</a>;
-    }
-    transformerInfo = <span>Transformer: {transformerInfo}</span>;
-  }
 
   return (
     <div id="Toolbar">
@@ -37,7 +24,6 @@ export default function Toolbar(props) {
       <SnippetButton {...props} />
       <CategoryButton {...props} />
       <ParserButton {...props} />
-      <TransformButton {...props} />
       <KeyMapButton {...props} />
       <a
         style={{minWidth: 0}}
@@ -46,9 +32,8 @@ export default function Toolbar(props) {
         href="https://github.com/fkling/astexplorer/blob/master/README.md">
         <i className="fa fa-lg fa-question fa-fw" />
       </a>
-      <div id="info" className={transformerInfo ? 'small' : ''}>
-        Parser: {parserInfo}<br />
-        {transformerInfo}
+      <div id="info">
+        Parser: {parserInfo}
       </div>
     </div>
   );
@@ -62,11 +47,8 @@ Toolbar.propTypes = {
   onParserChange: PropTypes.func,
   onParserSettingsButtonClick: PropTypes.func,
   onShareButtonClick: PropTypes.func,
-  onTransformChange: PropTypes.func,
   onKeyMapChange: PropTypes.func,
   parser: PropTypes.object,
-  transformer: PropTypes.object,
-  showTransformer: PropTypes.bool,
   canSave: PropTypes.bool,
   canFork: PropTypes.bool,
 };

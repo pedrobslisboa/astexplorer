@@ -12,12 +12,11 @@ import SettingsDialogContainer from './containers/SettingsDialogContainer';
 import ShareDialogContainer from './containers/ShareDialogContainer';
 import SplitPane from './components/SplitPane';
 import ToolbarContainer from './containers/ToolbarContainer';
-import TransformerContainer from './containers/TransformerContainer';
 import debounce from './utils/debounce';
 import {Provider, connect} from 'react-redux';
 import {astexplorer, persist, revive} from './store/reducers';
 import {createStore, applyMiddleware, compose} from 'redux';
-import {canSaveTransform, getRevision} from './store/selectors';
+import {getRevision} from './store/selectors';
 import {loadSnippet} from './store/actions';
 import {render} from 'react-dom';
 import * as gist from './storage/gist';
@@ -26,14 +25,13 @@ import StorageHandler from './storage';
 import '../css/style.css';
 import parserMiddleware from './store/parserMiddleware';
 import snippetMiddleware from './store/snippetMiddleware.js';
-import transformerMiddleware from './store/transformerMiddleware';
 import cx from './utils/classnames.js';
 
 function resize() {
   publish('PANEL_RESIZE');
 }
 
-function App({showTransformer, hasError}) {
+function App({hasError}) {
   return (
     <>
       <ErrorMessageContainer />
@@ -53,7 +51,6 @@ function App({showTransformer, hasError}) {
             <CodeEditorContainer />
             <ASTOutputContainer />
           </SplitPane>
-          {showTransformer ? <TransformerContainer /> : null}
         </SplitPane>
       </PasteDropTargetContainer>
     </>
@@ -62,12 +59,10 @@ function App({showTransformer, hasError}) {
 
 App.propTypes = {
   hasError: PropTypes.bool,
-  showTransformer: PropTypes.bool,
 };
 
 const AppContainer = connect(
   state => ({
-    showTransformer: state.showTransformPanel,
     hasError: !!state.error,
   }),
 )(App);
@@ -78,7 +73,7 @@ const store = createStore(
   astexplorer,
   revive(LocalStorage.readState()),
   composeEnhancers(
-    applyMiddleware(snippetMiddleware(storageAdapter), parserMiddleware, transformerMiddleware),
+    applyMiddleware(snippetMiddleware(storageAdapter), parserMiddleware),
   ),
 );
 store.subscribe(debounce(() => {
@@ -105,9 +100,4 @@ if (location.hash.length > 1) {
   store.dispatch(loadSnippet());
 }
 
-global.onbeforeunload = () => {
-  const state = store.getState();
-  if (canSaveTransform(state)) {
-    return 'You have unsaved transform code. Do you really want to leave?';
-  }
-};
+

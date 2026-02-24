@@ -5,10 +5,6 @@ export const START_LOADING_SNIPPET = 'START_LOADING_SNIPPET';
 export const DONE_LOADING_SNIPPET = 'DONE_LOADING_SNIPPET';
 export const CLEAR_SNIPPET = 'CLEAR_SNIPPET';
 export const SELECT_CATEGORY = 'CHANGE_CATEGORY';
-export const SELECT_TRANSFORMER = 'SELECT_TRANSFORMER';
-export const HIDE_TRANSFORMER = 'HIDE_TRANSFORMER';
-export const SET_TRANSFORM = 'SET_TRANSFORM';
-export const SET_TRANSFORM_RESULT = 'SET_TRANSFORM_RESULT';
 export const SET_PARSER = 'SET_PARSER';
 export const SET_PARSER_SETTINGS = 'SET_PARSER_SETTINGS';
 export const SET_PARSE_RESULT = 'SET_PARSE_RESULT';
@@ -26,7 +22,6 @@ export const SAVE = 'SAVE';
 export const START_SAVE = 'START_SAVE';
 export const END_SAVE = 'END_SAVE';
 export const RESET = 'RESET';
-export const TOGGLE_FORMATTING = 'TOGGLE_FORMATTING';
 export const SET_KEY_MAP = 'SET_KEY_MAP';
 
 export function setParser(parser) {
@@ -105,18 +100,6 @@ export function clearError() {
   return {type: CLEAR_ERROR};
 }
 
-export function selectTransformer(transformer) {
-  return {type: SELECT_TRANSFORMER, transformer};
-}
-
-export function hideTransformer() {
-  return {type: HIDE_TRANSFORMER};
-}
-
-export function setTransformState(state) {
-  return {type: SET_TRANSFORM, ...state};
-}
-
 export function setCode(state) {
   return {type: SET_CODE, ...state};
 }
@@ -131,10 +114,6 @@ export function dropText(text, categoryId) {
 
 export function reset() {
   return {type: RESET};
-}
-
-export function toggleFormatting() {
-  return {type: TOGGLE_FORMATTING};
 }
 
 export function setKeyMap(keyMap) {

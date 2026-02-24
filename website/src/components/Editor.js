@@ -6,16 +6,6 @@ import PropTypes from 'prop-types';
 import {subscribe, clear} from '../utils/pubsub.js';
 import React from 'react';
 
-const defaultPrettierOptions = {
-  printWidth: 80,
-  tabWidth: 2,
-  singleQuote: false,
-  trailingComma: 'none',
-  bracketSpacing: true,
-  jsxBracketSameLine: false,
-  parser: 'babel',
-};
-
 export default class Editor extends React.Component {
 
   constructor(props) {
@@ -92,21 +82,6 @@ export default class Editor extends React.Component {
         readOnly: this.props.readOnly,
       },
     );
-
-    this._bindCMHandler('blur', instance => {
-      if (!this.props.enableFormatting) return;
-
-      require(['prettier/standalone', 'prettier/parser-babel'], (prettier, babel) => {
-        const currValue = instance.doc.getValue();
-        const options = Object.assign({},
-          defaultPrettierOptions,
-          {
-            printWidth: instance.display.maxLineLength,
-            plugins: [babel],
-          });
-        instance.doc.setValue(prettier.format(currValue, options));
-      });
-    });
 
     this._bindCMHandler('changes', () => {
       clearTimeout(this._updateTimer);
@@ -230,7 +205,6 @@ Editor.propTypes = {
   posFromIndex: PropTypes.func,
   error: PropTypes.object,
   mode: PropTypes.string,
-  enableFormatting: PropTypes.bool,
   keyMap: PropTypes.string,
 };
 

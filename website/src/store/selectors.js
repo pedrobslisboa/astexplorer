@@ -1,5 +1,5 @@
 import isEqual from 'lodash.isequal';
-import {getParserByID, getTransformerByID} from '../parsers';
+import {getParserByID} from '../parsers';
 
 // Our selectors are not computationally expensive so we can just use this
 // implementation.
@@ -78,36 +78,8 @@ export function getKeyMap (state) {
   return state.workbench.keyMap;
 }
 
-
 const isCodeDirty = createSelector(
   [getCode, getInitialCode],
-  (code, initialCode) => code !== initialCode,
-);
-
-// Transform related
-
-export function getTransformCode(state) {
-  return state.workbench.transform.code;
-}
-
-export function getInitialTransformCode(state) {
-  return state.workbench.transform.initialCode;
-}
-
-export function getTransformer(state) {
-  return getTransformerByID(state.workbench.transform.transformer);
-}
-
-export function getTransformResult(state) {
-  return state.workbench.transform.transformResult;
-}
-
-export function showTransformer(state) {
-  return state.showTransformPanel;
-}
-
-const isTransformDirty = createSelector(
-  [getTransformCode, getInitialTransformCode],
   (code, initialCode) => code !== initialCode,
 );
 
@@ -122,11 +94,6 @@ const canSaveCode = createSelector(
     !revision || // can always save if there is no revision
     dirty
   ),
-);
-
-export const canSaveTransform = createSelector(
-  [showTransformer, isTransformDirty],
-  (showTransformer, dirty) => showTransformer && dirty,
 );
 
 const didParserSettingsChange = createSelector(
@@ -145,9 +112,9 @@ const didParserSettingsChange = createSelector(
 );
 
 export const canSave = createSelector(
-  [getRevision, canSaveCode, canSaveTransform, didParserSettingsChange],
-  (revision, canSaveCode, canSaveTransform, didParserSettingsChange) => (
-    (canSaveCode || canSaveTransform || didParserSettingsChange) &&
+  [getRevision, canSaveCode, didParserSettingsChange],
+  (revision, canSaveCode, didParserSettingsChange) => (
+    (canSaveCode || didParserSettingsChange) &&
     (!revision || revision.canSave())
   ),
 );
