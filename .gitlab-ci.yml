@@ -15,7 +15,7 @@ build-dev:
       - website/node_modules
   script:
     - cd website/
-    - yarn install --frozen-lockfile
+    - yarn
     - yarn build-dev
     - cd ..
     - ./scripts/inject-rev.sh out/index.html
@@ -80,7 +80,7 @@ build-prod:
   dependencies: []
   script:
     - cd website/
-    - yarn install --frozen-lockfile
+    - yarn
     - yarn build
     - cd ..
     - ./scripts/inject-rev.sh out/index.html

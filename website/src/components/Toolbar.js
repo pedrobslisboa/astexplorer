@@ -61,7 +61,7 @@ export default function Toolbar() {
 
   return (
     <div id="Toolbar">
-      <h1>AST Explorer</h1>
+      <h1>OCaml AST explorer</h1>
       <SnippetButton {...props} />
       <CategoryButton {...props} />
       <ParserButton {...props} />

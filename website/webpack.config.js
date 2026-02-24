@@ -7,6 +7,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 const DEV = process.env.NODE_ENV !== 'production';
+const PUBLIC_PATH = process.env.PUBLIC_PATH || (DEV ? '/' : '/astexplorer/');
 const CACHE_BREAKER = Number(fs.readFileSync(path.join(__dirname, 'CACHE_BREAKER')));
 
 const plugins = [
@@ -56,6 +57,9 @@ module.exports = Object.assign({
     },
     minimizer: [
       new TerserPlugin({
+        // Exclude async chunks (e.g. the astexplorer-refmt bundle) —
+        // they contain modern syntax that this version of Terser cannot parse.
+        exclude: /^\d+[-\w]*.js$/,
         terserOptions: {
           keep_fnames: true,
         },
@@ -155,6 +159,7 @@ module.exports = Object.assign({
 
   output: {
     path: path.resolve(__dirname, '../out'),
+    publicPath: PUBLIC_PATH,
     filename: DEV ? '[name].js' : `[name]-[contenthash]-${CACHE_BREAKER}.js`,
     chunkFilename: DEV ? '[name].js' : `[name]-[contenthash]-${CACHE_BREAKER}.js`,
   },
