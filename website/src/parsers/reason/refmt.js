@@ -49,8 +49,12 @@ export default {
     return JSON.parse(parser.parseReason(code));
   },
 
-  getNodeName(node) {
-    return node.type;
+  getTreeFilters({ignoreKeysFilter, emptyKeysFilter, locationInformationFilter}) {
+    return [
+      ignoreKeysFilter(this._ignoredProperties),
+      emptyKeysFilter(),
+      locationInformationFilter(this.locationProps),
+    ];
   },
 
   nodeToRange(node) {

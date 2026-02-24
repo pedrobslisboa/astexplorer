@@ -1,7 +1,6 @@
 import React from 'react';
-import {useSelector, useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import CategoryButton from './buttons/CategoryButton';
-import ParserButton from './buttons/ParserButton';
 import SnippetButton from './buttons/SnippetButton';
 import KeyMapButton from './buttons/KeyMapButton';
 import {
@@ -50,31 +49,21 @@ export default function Toolbar() {
     },
   };
 
-  let parserInfo = parser.displayName;
-  if (parser.version) {
-    parserInfo += '-' + parser.version;
-  }
-  if (parser.homepage) {
-    parserInfo =
-      <a href={parser.homepage} target="_blank" rel="noopener noreferrer">{parserInfo}</a>;
-  }
-
   return (
     <div id="Toolbar">
       <h1>OCaml AST explorer</h1>
       <SnippetButton {...props} />
       <CategoryButton {...props} />
-      <ParserButton {...props} />
       <KeyMapButton {...props} />
       <a
-        style={{minWidth: 0}}
+        style={{ minWidth: 0 }}
         target="_blank" rel="noopener noreferrer"
         title="Help"
-        href="https://github.com/fkling/astexplorer/blob/master/README.md">
+        href="https://github.com/pedrolisboa/ocaml-ast-explorer/blob/master/README.md">
         <i className="fa fa-lg fa-question fa-fw" />
       </a>
       <div id="info">
-        Parser: {parserInfo}
+        Ppxlib AST version: <a href={"https://github.com/ocaml-ppx/ppxlib/releases/tag/0.37.0"} target="_blank" rel="noopener noreferrer">3.7.0</a>
       </div>
     </div>
   );

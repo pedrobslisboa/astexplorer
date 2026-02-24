@@ -1,6 +1,8 @@
 import {getParser, getParserSettings, getCode} from './selectors';
 import {ignoreKeysFilter, locationInformationFilter, functionFilter, emptyKeysFilter, typeKeysFilter} from '../core/TreeAdapter.js';
 
+const filterFactories = {ignoreKeysFilter, functionFilter, emptyKeysFilter, locationInformationFilter, typeKeysFilter};
+
 function parse(parser, code, parserSettings) {
   if (!parser._promise) {
     parser._promise = new Promise(parser.loadParser);
@@ -47,13 +49,7 @@ export default store => next => action => {
             nodeToRange: newParser.nodeToRange.bind(newParser),
             nodeToName: newParser.getNodeName.bind(newParser),
             walkNode: newParser.forEachProperty.bind(newParser),
-            filters: [
-              ignoreKeysFilter(newParser._ignoredProperties),
-              functionFilter(),
-              emptyKeysFilter(),
-              locationInformationFilter(newParser.locationProps),
-              typeKeysFilter(newParser.typeProps),
-            ],
+            filters: newParser.getTreeFilters(filterFactories),
             locationProps: newParser.locationProps,
           },
         };
