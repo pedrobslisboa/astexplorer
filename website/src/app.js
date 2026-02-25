@@ -15,7 +15,7 @@ import debounce from './utils/debounce';
 import {Provider, useSelector} from 'react-redux';
 import {astexplorer, persist, revive} from './store/reducers';
 import {createStore, applyMiddleware, compose} from 'redux';
-import {getRevision} from './store/selectors';
+import {getRevision, getTheme} from './store/selectors';
 import {loadSnippet} from './store/actions';
 import {render} from 'react-dom';
 import * as gist from './storage/gist';
@@ -27,6 +27,14 @@ import cx from './utils/classnames.js';
 
 function resize() {
   publish('PANEL_RESIZE');
+}
+
+const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+function applyTheme(theme) {
+  const prefersDark = darkMediaQuery.matches;
+  const isDark = theme === 'dark' || (theme === 'auto' && prefersDark);
+  document.documentElement.classList.toggle('dark', isDark);
 }
 
 function App() {
@@ -72,7 +80,15 @@ store.subscribe(debounce(() => {
     LocalStorage.writeState(persist(state));
   }
 }));
+
+// Apply theme class whenever theme state changes
+store.subscribe(() => applyTheme(getTheme(store.getState())));
+// Also react to OS-level dark mode changes (for 'auto' mode)
+darkMediaQuery.addListener(() => applyTheme(getTheme(store.getState())));
+
 store.dispatch({type: 'INIT'});
+// Apply initial theme before first render
+applyTheme(getTheme(store.getState()));
 
 render(
   <Provider store={store}>

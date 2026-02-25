@@ -4,6 +4,60 @@
 @import "~font-awesome/css/font-awesome.css";
 @import "../fontcustom/fontcustom.css";
 
+/* ─── CSS custom properties (light defaults) ─── */
+:root {
+  --bg:              #ffffff;
+  --bg-toolbar:      #efefef;
+  --bg-editor:       #ffffff;
+  --bg-json:         #efefef;
+  --bg-dialog:       #ffffff;
+  --bg-banner:       #b8dff7;
+  --border:          #dddddd;
+  --text:            #454545;
+  --text-muted:      #898989;
+  --text-contrib:    #555555;
+  --text-dialog:     #333333;
+  --shadow:          #555555;
+  --overlay:         rgba(255, 255, 255, 0.7);
+  --highlight-mark:  rgba(255, 240, 6, 0.4);
+  --error-marker:    #EB949433;
+  --active-btn-bg:   #999999;
+  --active-btn-text: #f5f5f5;
+  --divider:         #dddddd;
+  --divider-hover:   #999999;
+  --hover-bg:        rgba(0, 0, 0, 0.1);
+  --active-bg:       rgba(0, 0, 0, 0.3);
+  --selected-bg:     rgba(0, 0, 0, 0.05);
+  --disabled-text:   #888888;
+}
+
+/* ─── Dark mode overrides ─── */
+html.dark {
+  --bg:              #1e1e1e;
+  --bg-toolbar:      #252526;
+  --bg-editor:       #1e1e1e;
+  --bg-json:         #252526;
+  --bg-dialog:       #2d2d2d;
+  --bg-banner:       #1e3a4a;
+  --border:          #3c3c3c;
+  --text:            #cccccc;
+  --text-muted:      #858585;
+  --text-contrib:    #999999;
+  --text-dialog:     #cccccc;
+  --shadow:          #000000;
+  --overlay:         rgba(0, 0, 0, 0.6);
+  --highlight-mark:  rgba(255, 220, 0, 0.25);
+  --error-marker:    #7a2020aa;
+  --active-btn-bg:   #555555;
+  --active-btn-text: #eeeeee;
+  --divider:         #3c3c3c;
+  --divider-hover:   #666666;
+  --hover-bg:        rgba(255, 255, 255, 0.08);
+  --active-bg:       rgba(255, 255, 255, 0.15);
+  --selected-bg:     rgba(255, 255, 255, 0.05);
+  --disabled-text:   #666666;
+}
+
 html {
   font-size: 14px;
   box-sizing: border-box;
@@ -36,12 +90,16 @@ body {
 
 #contribution {
   font-size: 0.9em;
-  color: #555;
+  color: var(--text-contrib);
   height: 25px;
   text-align: center;
   line-height: 25px;
-  background-color: #efefef;
-  border-top: 1px solid #ddd;
+  background-color: var(--bg-toolbar);
+  border-top: 1px solid var(--border);
+}
+
+#contribution a {
+  color: var(--text-contrib);
 }
 
 .cover {
@@ -51,7 +109,7 @@ body {
   left: 0;
   right: 0;
   z-index: 200;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,7 +121,7 @@ body {
 
 .loadingIndicator {
   font-size: 200%;
-  color: #555;
+  color: var(--text-muted);
 }
 
 .dropIndicator {
@@ -73,7 +131,7 @@ body {
   left: 0;
   right: 0;
   z-index: 200;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,33 +147,34 @@ body {
 }
 
 .banner {
-  background-color: #b8dff7;
-  border-right: 1px solid #ddd;
+  background-color: var(--bg-banner);
+  border-right: 1px solid var(--border);
   padding: 8px;
   text-align: center;
+  color: var(--text);
 }
 
 #Toolbar {
   flex: 0 0 auto;
   font-family: monospace;
   line-height: 32px;
-  border-bottom: 1px solid #ddd;
-  color: #454545;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
   padding-left: 10px;
   padding-right: 10px;
   z-index: 200;
-  display:flex;
+  display: flex;
   flex-wrap: wrap;
 }
 
 #Toolbar > * {
   flex: 0 0 auto;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid var(--border);
 }
 
 #Toolbar,
 #Toolbar .menuButton ul {
-  background-color: #efefef;
+  background-color: var(--bg-toolbar);
 }
 
 #Toolbar > *,
@@ -163,7 +222,7 @@ body {
   margin: 0;
   list-style: none;
   display: none;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   max-height: calc(100vh - 65px);
   overflow-y: auto;
   z-index: 500;
@@ -188,27 +247,35 @@ body {
 #Toolbar button:disabled:hover,
 #Toolbar button:disabled:active {
   background-color: transparent;
-  color: #888;
+  color: var(--disabled-text);
   cursor: default;
 }
 
 #Toolbar .menuButton li.selected {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: var(--selected-bg);
 }
 
 #Toolbar > a:hover,
 #Toolbar > .button:hover,
 #Toolbar ul button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--hover-bg);
 }
 
 #Toolbar > a:active,
 #Toolbar button:active {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: var(--active-bg);
+}
+
+/* Theme toggle button sits directly in Toolbar, not a menuButton */
+#Toolbar .themeToggle {
+  border: none;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  padding: 0 10px;
 }
 
 #info {
-  color: #898989;
+  color: var(--text-muted);
   cursor: default;
   border: none;
   margin-left: auto;
@@ -217,6 +284,10 @@ body {
 .errorMessage {
   font-family: Verdana, non-serif;
   font-size: 1.2em;
+  background-color: var(--bg-dialog);
+  color: var(--text);
+  padding: 20px;
+  border-radius: 4px;
 }
 
 .errorMessage h3 {
@@ -240,7 +311,7 @@ body {
 }
 
 .splitpane-divider {
-  background-color: #ddd;
+  background-color: var(--divider);
 }
 
 .splitpane-divider.horizontal {
@@ -252,7 +323,7 @@ body {
 }
 
 .splitpane-divider:hover {
-  background-color: #999;
+  background-color: var(--divider-hover);
   cursor: col-resize;
 }
 
@@ -271,7 +342,9 @@ body {
 .output .toolbar {
   font-size: 14px;
   margin-left: -1px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--bg-toolbar);
+  color: var(--text);
 }
 
 .output .toolbar > button {
@@ -279,10 +352,11 @@ body {
   height: 100%;
   min-width: 90px;
   border: 1px solid transparent;
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   font-size: 14px;
   background-color: transparent;
+  color: var(--text);
   display: inline-block;
   vertical-align: top;
   outline: none;
@@ -290,9 +364,9 @@ body {
 }
 
 .output .toolbar > button.active {
-  border-color: #999;
-  background-color: #999;
-  color: #f5f5f5;
+  border-color: var(--active-btn-bg);
+  background-color: var(--active-btn-bg);
+  color: var(--active-btn-text);
 }
 
 .output .toolbar .time {
@@ -300,6 +374,7 @@ body {
   margin-right: 10px;
   font-size: 10px;
   line-height: 25px;
+  color: var(--text-muted);
 }
 
 .output > .container {
@@ -314,7 +389,7 @@ body {
 
 #JSONEditor .CodeMirror,
 #JSONEditor .CodeMirror-gutters {
-  background-color: #efefef;
+  background-color: var(--bg-json);
 }
 
 .editor {
@@ -335,11 +410,12 @@ li.entry {
 .CodeMirror .marked,
 .entry.highlighted {
   border-radius: 2px;
-  background-color: rgba(255,240,6,0.4);
+  background-color: var(--highlight-mark);
 }
 
 .entry > .value {
   white-space: pre-wrap;
+  color: var(--text);
 }
 
 .entry > .value .s {
@@ -397,7 +473,7 @@ li.entry {
 }
 
 .editor .CodeMirror-gutters {
-  background-color: white;
+  background-color: var(--bg-editor);
   border: none;
 }
 
@@ -406,15 +482,15 @@ li.entry {
 }
 
 .CodeMirror pre.errorMarker {
-  background-color: #EB949433;
+  background-color: var(--error-marker);
 }
 
 /* Dialog */
 .dialog {
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: var(--overlay);
   bottom: 0;
-  color: #333;
+  color: var(--text-dialog);
   display: flex;
   justify-content: center;
   left: 0;
@@ -426,8 +502,8 @@ li.entry {
 
 .dialog .inner {
   max-height: 90vh;
-  background-color: white;
-  box-shadow: 0px 0px 10px #555;
+  background-color: var(--bg-dialog);
+  box-shadow: 0px 0px 10px var(--shadow);
   border-radius: 3px;
   min-width: 400px;
   display: flex;
@@ -437,11 +513,13 @@ li.entry {
 .dialog .header {
   flex-shrink: 0;
   padding: 10px 10px 0px 10px;
+  color: var(--text);
 }
 
 .dialog .body {
   overflow: auto;
   padding: 10px;
+  color: var(--text);
 }
 
 .dialog .footer {
@@ -455,6 +533,19 @@ li.entry {
   padding: 0;
 }
 
+.dialog button {
+  background-color: var(--bg-toolbar);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.dialog button:hover {
+  background-color: var(--hover-bg);
+}
+
 #SettingsDialog ul.settings {
   margin: 0;
   padding: 0;
@@ -464,7 +555,6 @@ li.entry {
 #SettingsDialog ul.settings li {
   padding: 3px 0;
 }
-
 
 .shareInfo dd {
   margin: 0;
@@ -476,6 +566,7 @@ li.entry {
   font-size: 15px;
   padding: 5px;
   width: calc(100% - 10px);
+  background-color: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
-
-

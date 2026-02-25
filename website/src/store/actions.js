@@ -21,6 +21,7 @@ export const START_SAVE = 'START_SAVE';
 export const END_SAVE = 'END_SAVE';
 export const RESET = 'RESET';
 export const SET_KEY_MAP = 'SET_KEY_MAP';
+export const SET_THEME = 'SET_THEME';
 
 export function setParser(parser) {
   return {type: SET_PARSER, parser};
@@ -107,5 +108,9 @@ export function reset() {
 }
 
 export function setKeyMap(keyMap) {
-  return {type: SET_KEY_MAP, keyMap}
+  return {type: SET_KEY_MAP, keyMap};
+}
+
+export function setTheme(theme) {
+  return {type: SET_THEME, theme};
 }

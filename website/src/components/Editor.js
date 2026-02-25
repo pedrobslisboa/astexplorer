@@ -2,11 +2,19 @@ import CodeMirror from 'codemirror';
 import 'codemirror/keymap/vim';
 import 'codemirror/keymap/emacs';
 import 'codemirror/keymap/sublime';
+import 'codemirror/theme/material-darker.css';
 import React, {useRef, useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {subscribe, clear} from '../utils/pubsub.js';
 import {setCode, setCursor} from '../store/actions';
-import {getCode, getParser, getParseResult, getKeyMap} from '../store/selectors';
+import {getCode, getParser, getParseResult, getKeyMap, getTheme} from '../store/selectors';
+
+const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+function resolveEditorTheme(theme) {
+  const isDark = theme === 'dark' || (theme === 'auto' && darkMediaQuery.matches);
+  return isDark ? 'material-darker' : 'default';
+}
 
 export default function Editor() {
   const dispatch = useDispatch();
@@ -14,17 +22,19 @@ export default function Editor() {
   const parser = useSelector(getParser);
   const parseResult = useSelector(getParseResult);
   const keyMap = useSelector(getKeyMap);
+  const theme = useSelector(getTheme);
 
   const mode = parser.category.editorMode || parser.category.id;
   const error = parseResult && parseResult.error;
+  const editorTheme = resolveEditorTheme(theme);
 
   const containerRef = useRef(null);
   const cmRef = useRef(null);
-  // Track previous props for comparison in effects
   const prevValueRef = useRef(value);
   const prevModeRef = useRef(mode);
   const prevKeyMapRef = useRef(keyMap);
   const prevErrorRef = useRef(error);
+  const prevThemeRef = useRef(editorTheme);
   const updateTimerRef = useRef(null);
   const markerRangeRef = useRef(null);
   const markRef = useRef(null);
@@ -56,6 +66,7 @@ export default function Editor() {
       keyMap,
       value,
       mode,
+      theme: editorTheme,
       lineNumbers: true,
       readOnly: false,
     });
@@ -92,7 +103,6 @@ export default function Editor() {
       }),
     );
 
-    // Highlight support
     markerRangeRef.current = null;
     markRef.current = null;
     subscriptionsRef.current.push(
@@ -142,15 +152,13 @@ export default function Editor() {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Sync value changes from store → CodeMirror
+  // Sync value changes
   useEffect(() => {
     const cm = cmRef.current;
     if (!cm) return;
     if (value !== prevValueRef.current) {
       prevValueRef.current = value;
-      if (cm.getValue() !== value) {
-        cm.setValue(value);
-      }
+      if (cm.getValue() !== value) cm.setValue(value);
     }
   }, [value]);
 
@@ -183,6 +191,16 @@ export default function Editor() {
       prevErrorRef.current = error;
     }
   }, [error]);
+
+  // Sync theme changes
+  useEffect(() => {
+    const cm = cmRef.current;
+    if (!cm) return;
+    if (editorTheme !== prevThemeRef.current) {
+      prevThemeRef.current = editorTheme;
+      cm.setOption('theme', editorTheme);
+    }
+  }, [editorTheme]);
 
   return <div className="editor" ref={containerRef} />;
 }

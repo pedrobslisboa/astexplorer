@@ -13,6 +13,7 @@ const initialState = {
   saving: false,
   cursor: null,
   error: null,
+  theme: 'auto',
 
   // Snippet related state
   selectedRevision: null,
@@ -40,7 +41,7 @@ const initialState = {
  */
 export function persist(state) {
   return {
-    ...pick(state, 'parserSettings', 'parserPerCategory'),
+    ...pick(state, 'parserSettings', 'parserPerCategory', 'theme'),
     workbench: pick(state.workbench, 'parser', 'code', 'keyMap'),
   };
 }
@@ -70,6 +71,9 @@ export function astexplorer(state=initialState, action) {
     forking: forking(state.forking, action),
     cursor: cursor(state.cursor, action),
     error: error(state.error, action),
+
+    // Theme
+    theme: theme(state.theme, action),
 
     // Snippet related state
     activeRevision: activeRevision(state.activeRevision, action),
@@ -272,6 +276,15 @@ function activeRevision(state=initialState.selectedRevision, action) {
     case actions.CLEAR_SNIPPET:
     case actions.RESET:
       return null;
+    default:
+      return state;
+  }
+}
+
+function theme(state=initialState.theme, action) {
+  switch (action.type) {
+    case actions.SET_THEME:
+      return action.theme;
     default:
       return state;
   }

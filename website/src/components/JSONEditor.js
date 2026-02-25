@@ -3,14 +3,28 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/fold/foldgutter';
 import 'codemirror/addon/fold/foldcode';
 import 'codemirror/addon/fold/brace-fold';
+import 'codemirror/theme/material-darker.css';
 import PropTypes from 'prop-types';
 import {subscribe, clear} from '../utils/pubsub.js';
 import React, {useRef, useEffect} from 'react';
+import {useSelector} from 'react-redux';
+import {getTheme} from '../store/selectors';
+
+const darkMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+function resolveEditorTheme(theme) {
+  const isDark = theme === 'dark' || (theme === 'auto' && darkMediaQuery.matches);
+  return isDark ? 'material-darker' : 'default';
+}
 
 export default function JSONEditor({value, className}) {
+  const theme = useSelector(getTheme);
+  const editorTheme = resolveEditorTheme(theme);
+
   const containerRef = useRef(null);
   const cmRef = useRef(null);
   const prevValueRef = useRef(value);
+  const prevThemeRef = useRef(editorTheme);
 
   // Mount CodeMirror
   useEffect(() => {
@@ -18,6 +32,7 @@ export default function JSONEditor({value, className}) {
     const cm = CodeMirror(containerRef.current, { // eslint-disable-line new-cap
       value: value || '',
       mode: {name: 'javascript', json: true},
+      theme: editorTheme,
       readOnly: true,
       lineNumbers: true,
       foldGutter: true,
@@ -50,6 +65,16 @@ export default function JSONEditor({value, className}) {
     cm.setValue(value);
     cm.scrollTo(info.left, info.top);
   }, [value]);
+
+  // Sync theme changes
+  useEffect(() => {
+    const cm = cmRef.current;
+    if (!cm) return;
+    if (editorTheme !== prevThemeRef.current) {
+      prevThemeRef.current = editorTheme;
+      cm.setOption('theme', editorTheme);
+    }
+  }, [editorTheme]);
 
   return <div id="JSONEditor" className={className} ref={containerRef} />;
 }
