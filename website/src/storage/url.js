@@ -2,10 +2,12 @@
  * URL-based storage backend.
  *
  * Encodes the snippet state directly into the URL as query parameters:
- *   ?parser=refmt-ml&code=<base64url-encoded source>
+ *   ?language=ocaml&code=<base64url-encoded source>
  *
  * No server required — everything lives in the URL.
  */
+
+import {getCategoryByID, getDefaultParser} from '../parsers';
 
 function encode(str) {
   // UTF-8 safe base64
@@ -19,17 +21,17 @@ function decode(b64) {
 function getParamsFromURL() {
   const params = new URLSearchParams(global.location.search);
   const code = params.get('code');
-  const parser = params.get('parser');
+  const language = params.get('language');
   if (code) {
-    return {code, parser};
+    return {code, language};
   }
   return null;
 }
 
 class Revision {
-  constructor({code, parser}) {
+  constructor({code, language}) {
     this._code = code;
-    this._parser = parser;
+    this._language = language;
   }
 
   canSave() {
@@ -37,7 +39,12 @@ class Revision {
   }
 
   getParserID() {
-    return this._parser;
+    const category = getCategoryByID(this._language);
+    if (category) {
+      const parser = getDefaultParser(category);
+      return parser ? parser.id : null;
+    }
+    return null;
   }
 
   getCode() {
@@ -69,7 +76,7 @@ export function fetchFromURL() {
   }
   try {
     const code = decode(data.code);
-    return Promise.resolve(new Revision({code, parser: data.parser}));
+    return Promise.resolve(new Revision({code, language: data.language}));
   } catch (e) {
     return Promise.reject(new Error('Failed to decode code from URL.'));
   }
@@ -79,9 +86,9 @@ export function fetchFromURL() {
  * Encode state into query params and update the browser URL without
  * triggering a page reload or a popstate event.
  */
-export function updateURL({parser, code}) {
+export function updateURL({language, code}) {
   const params = new URLSearchParams();
-  params.set('parser', parser);
+  params.set('language', language);
   params.set('code', encode(code));
   const newURL = `${global.location.pathname}?${params.toString()}`;
   global.history.pushState(null, '', newURL);

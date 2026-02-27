@@ -51,7 +51,7 @@ function saveSnippet(state, storageAdapter) {
   const code = selectors.getCode(state);
 
   storageAdapter.updateURL({
-    parser: parser.id,
+    language: parser.category.id,
     code,
   });
 }
